@@ -1,0 +1,80 @@
+program = { block ~ "." }
+
+block = {
+    (const_declaration)? ~
+    (var_declaration)? ~
+    (procedure_declaration)* ~
+    statement
+}
+
+const_declaration = {
+    "const" ~ const_assignment ~ ("," ~ const_assignment)* ~ ";"
+}
+
+const_assignment = {
+    ident ~ "=" ~ number
+}
+
+var_declaration = {
+    "var" ~ ident ~ ("," ~ ident)* ~ ";"
+}
+
+procedure_declaration = {
+    "procedure" ~ ident ~ ";" ~ block ~ ";"
+}
+
+statement = {
+    assignment |
+    procedure_call |
+    input |
+    output |
+    compound_statement |
+    conditional_statement |
+    loop_statement
+}
+
+assignment = {
+    ident ~ ":=" ~ expression
+}
+
+procedure_call = {
+    "call" ~ ident
+}
+
+input = {
+    "?" ~ ident
+}
+
+output = {
+    "!" ~ expression
+}
+
+compound_statement = {
+    "begin" ~ statement ~ (";" ~ statement)* ~ "end"
+}
+
+conditional_statement = {
+    "if" ~ condition ~ "then" ~ statement
+}
+
+loop_statement = {
+    "while" ~ condition ~ "do" ~ statement
+}
+
+condition = {
+    ("odd" ~ expression) |
+    (expression ~ ("=" | "#" | "<" | "<=" | ">" | ">=") ~ expression)
+}
+
+expression = {
+    (("+" | "-")? ~ term ~ (("+" | "-") ~ term)*)
+}
+
+term = { factor ~ (("*" | "/") ~ factor)* }
+
+factor = { ident | number | ("(" ~ expression ~ ")") }
+
+ident = @{ ASCII_ALPHANUMERIC+ }
+number = @{ ASCII_DIGIT+ }
+
+WHITESPACE = _{ " " | "\t" | "\n" }
