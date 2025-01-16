@@ -1,3 +1,4 @@
+mod compile;
 mod parse;
 
 use std::fs;
@@ -12,5 +13,5 @@ fn main() {
 
     let input = inputs.single().unwrap();
 
-    PL0Parser::program(input)
+    println!("{:#?}", PL0Parser::program(input));
 }

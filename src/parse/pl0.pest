@@ -1,14 +1,14 @@
-program = { block ~ "." }
+program = { SOI ~ block+ ~ "." ~ EOI }
 
 block = {
-    (const_declaration)? ~
-    (var_declaration)? ~
-    (procedure_declaration)* ~
-    statement
+    const_declaration
+  | var_declaration
+  | procedure_declaration
+  | statement
 }
 
 const_declaration = {
-    "const" ~ const_assignment ~ ("," ~ const_assignment)* ~ ";"
+    ^"const" ~ const_assignment ~ ("," ~ const_assignment)* ~ ";"
 }
 
 const_assignment = {
@@ -16,21 +16,21 @@ const_assignment = {
 }
 
 var_declaration = {
-    "var" ~ ident ~ ("," ~ ident)* ~ ";"
+    ^"var" ~ ident ~ ("," ~ ident)* ~ ";"
 }
 
 procedure_declaration = {
-    "procedure" ~ ident ~ ";" ~ block ~ ";"
+    ^"procedure" ~ ident ~ ";" ~ block ~ ";"
 }
 
 statement = {
-    assignment |
-    procedure_call |
-    input |
-    output |
-    compound_statement |
-    conditional_statement |
-    loop_statement
+    assignment
+  | procedure_call
+  | input
+  | output
+  | compound_statement
+  | conditional_statement
+  | loop_statement
 }
 
 assignment = {
@@ -38,7 +38,7 @@ assignment = {
 }
 
 procedure_call = {
-    "call" ~ ident
+    ^"call" ~ ident
 }
 
 input = {
@@ -50,31 +50,31 @@ output = {
 }
 
 compound_statement = {
-    "begin" ~ statement ~ (";" ~ statement)* ~ "end"
+    ^"begin" ~ statement ~ (";" ~ statement)* ~ ^"end"
 }
 
 conditional_statement = {
-    "if" ~ condition ~ "then" ~ statement
+    ^"if" ~ condition ~ ^"then" ~ statement
 }
 
 loop_statement = {
-    "while" ~ condition ~ "do" ~ statement
+    ^"while" ~ condition ~ ^"do" ~ statement
 }
 
 condition = {
-    ("odd" ~ expression) |
-    (expression ~ ("=" | "#" | "<" | "<=" | ">" | ">=") ~ expression)
+    (^"odd" ~ expression)
+  | (expression ~ comparison_op ~ expression)
 }
 
-expression = {
-    (("+" | "-")? ~ term ~ (("+" | "-") ~ term)*)
-}
+comparison_op = { "=" | "#" | "<=" | ">=" | "<" | ">" }
 
-term = { factor ~ (("*" | "/") ~ factor)* }
+expression = { term ~ (op ~ term)* }
+term       = { factor ~ (op ~ factor)* }
+factor     = { number | ident | "(" ~ expression ~ ")" }
 
-factor = { ident | number | ("(" ~ expression ~ ")") }
+op = { "+" | "-" | "*" | "/" }
 
-ident = @{ ASCII_ALPHANUMERIC+ }
+ident  = @{ ASCII_ALPHANUMERIC+ }
 number = @{ ASCII_DIGIT+ }
 
 WHITESPACE = _{ " " | "\t" | "\n" }
