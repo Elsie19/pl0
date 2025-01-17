@@ -7,13 +7,13 @@ use pest_consume::Parser;
 pub struct PL0Parser;
 
 #[derive(Debug)]
-pub struct Call(String);
+pub struct Call(pub String);
 #[derive(Debug)]
-pub struct Input(String);
+pub struct Input(pub String);
 #[derive(Debug)]
-pub struct Output(Expression);
+pub struct Output(pub Expression);
 #[derive(Debug)]
-pub struct Block(Box<Do>);
+pub struct Block(pub Do);
 
 #[derive(Debug)]
 pub struct Const {
@@ -111,7 +111,7 @@ pub enum Do {
     Const(Vec<Const>),
     Var(Vec<Var>),
     Procedure(Vec<Procedure>),
-    Statement(Box<Statement>),
+    Statement(Statement),
 }
 
 type Result<T> = std::result::Result<T, Error<Rule>>;
@@ -121,7 +121,7 @@ type Node<'i> = pest_consume::Node<'i, Rule, ()>;
 impl PL0Parser {
     pub fn program(input: Node) -> Result<Vec<Block>> {
         Ok(match_nodes!(input.into_children();
-            [block(block).., EOI(())] => block.map(|b| Block(Box::new(b))).collect(),
+            [block(block).., EOI(())] => block.map(|b| Block(b)).collect(),
         ))
     }
 
@@ -130,7 +130,7 @@ impl PL0Parser {
             [const_declaration(co)] => Do::Const(co),
             [var_declaration(var)] => Do::Var(var),
             [procedure_declaration(proc)..] => Do::Procedure(proc.collect()),
-            [statement(stmt)] => Do::Statement(Box::new(stmt)),
+            [statement(stmt)] => Do::Statement(stmt),
         ))
     }
 

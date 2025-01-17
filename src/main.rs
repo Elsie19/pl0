@@ -3,6 +3,7 @@ mod parse;
 
 use std::fs;
 
+use compile::qbe::compile;
 use parse::grammar::{PL0Parser, Rule};
 use pest_consume::Parser;
 
@@ -13,5 +14,8 @@ fn main() {
 
     let input = inputs.single().unwrap();
 
-    println!("{:#?}", PL0Parser::program(input));
+    let module = compile(&PL0Parser::program(input.clone()).unwrap());
+
+    println!("{:#?}", PL0Parser::program(input).unwrap());
+    println!("{}", module);
 }
